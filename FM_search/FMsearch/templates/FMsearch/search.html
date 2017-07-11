@@ -1,0 +1,52 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<div id='errors'>
+	{{pre_error}}
+	{{query_error}}
+</div>
+<div id='inputs'>
+<form action= "{% url 'FMsearch:search' request.choice request.query%}" method = "post" >
+{% csrf_token %}
+	<label for 'new_ref_name'>Name of file:</label>
+	<input type="text" id='new_ref_name' name='new_ref_name' value = '{{ current_ref_name }}'>
+	<label for 'new_ref'>File:</label>
+	<input type="text" id='new_ref' name='new_ref' value = '{{ current_ref }}'>
+	<input type="submit" name='preprocess' value='preprocess'>
+	<select name='choice' id='choice_sel' onchange='changeText()'>
+		<option value='none' id='def' name='choice' selected="selected">
+		<label for choice 'def'>select a reference string</label>
+	{% for ref in saved_refs.all %}
+		<option name = 'choice' id = 'choice{{forloop.counter}}' value = '{{ref.id}};{{ref.data}}'/>
+		<label for 'choice{{ forloop.counter }}'> {{ref.name}}</label><br />
+	{% endfor %}
+	</select>
+	
+	<label for 'query'>Input query:</label>
+	<input type="text" id='query' name="query" value = '{{ current_query }}'>
+	<input type="submit" name='search' value='search'>
+	</form>
+</div>
+{{response}}
+
+<p id='disp' rows='4' cols='50'>
+current selection:
+</p>
+
+<p id='prev' rows='4' cols='50'>
+previous search: {{formatted}}
+</p>
+
+
+
+<script type="text/javascript">
+	function changeText() {
+		var sel = document.getElementById('choice_sel');
+		// var value = sel.options[sel.selectedIndex].value;
+		var text = sel.options[sel.selectedIndex].value.split(';')[1];
+		// alert(text);
+		var disp = document.getElementById('disp');
+		disp.innerHTML = 'current selection: ' + text;
+	}
+</script>

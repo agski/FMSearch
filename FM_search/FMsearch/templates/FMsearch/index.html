@@ -1,0 +1,68 @@
+{% load bootstrap3 %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'FMsearch/style.css' %}" />
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<header>
+	<h1><a href="https://en.wikipedia.org/wiki/FM-index">FM Index</a> based substring search </h1>
+	<h2>1) Enter a file and file name to build the FM Index</h2>
+	<h2>2) Choose a processed file and input a query to search for instances of it</h2>
+	<h3>Code can be found <a href="https://github.com/agski/FMSearch.git">here</a> </h3>
+</header>
+<div id='errors'>
+	<p>{{pre_error}}{{query_error}}</p>
+</div>
+<div id='inputs'>
+	<form action= "{% url 'FMsearch:index' %}" method = "post" >
+	{% csrf_token %}
+	<label for 'new_ref_name'>Name of file:</label>
+	<input type="text" id='new_ref_name' name='new_ref_name' value = '{{ current_ref_name }}'>
+	<label for 'new_ref'>File:</label>
+	<input type="text" id='new_ref' name='new_ref' value = '{{ current_ref }}'>
+	<input type="submit" name='preprocess' value='Build Index'>
+	<select name='choice' id='choice_sel' onchange='changeText()'>
+		<option value='none' id='def' name='choice' selected="selected">
+		<label for choice 'def'>select a reference string</label>
+	{% for ref in saved_refs.all %}
+		<option name = 'choice' id = 'choice{{forloop.counter}}' value = '{{ref.id}};{{ref.data}}'/>
+		<label for 'choice{{ forloop.counter }}'> {{ref.name}}</label><br />
+	{% endfor %}
+	</select>
+	<label for 'query'>Input query:</label>
+	<input type="text" id='query' name="query" value = '{{ current_query }}'>
+	<input type="submit" name='search' value='Search'>
+	</form>
+</div>
+
+<div id='selected'>
+	<p id='disp'>
+	</p>
+</div>
+
+<div id='format'>
+{% if formatted %}
+	<p>
+	Search result: '{{query}}', {{formatted}}
+	</p>
+{% endif %}
+</div>
+
+<div id='response'>
+	<p>
+	{{response}}
+	</p>
+</div>
+
+
+
+<script type="text/javascript">
+	function changeText() {
+		var sel = document.getElementById('choice_sel');
+		// var value = sel.options[sel.selectedIndex].value;
+		var text = sel.options[sel.selectedIndex].value.split(';')[1];
+		// alert(text);
+		var disp = document.getElementById('disp');
+		disp.innerHTML = 'Current selection: ' + text;
+	}
+</script>
